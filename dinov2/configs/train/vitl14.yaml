@@ -1,11 +1,5 @@
-dino:
-  head_n_prototypes: 131072
-  head_bottleneck_dim: 384
-ibot:
-  separate_head: true
-  head_n_prototypes: 131072
 train:
-  batch_size_per_gpu: 32
+  batch_size_per_gpu: 4
   dataset_path: ImageNet22k
   centering: sinkhorn_knopp
 student:
@@ -14,6 +8,8 @@ student:
   drop_path_rate: 0.4
   ffn_layer: swiglufused
   block_chunks: 4
+  pretrained_weights: 'pretrained/checkpoints/dinov2_vitl14_pretrain.pth'
+
 teacher:
   momentum_teacher: 0.994
 optim:

@@ -13,7 +13,7 @@ from fvcore.common.checkpoint import PeriodicCheckpointer
 import torch
 
 from dinov2.data import SamplerType, make_data_loader, make_dataset
-from dinov2.data import collate_data_and_cast, DataAugmentationDINO, MaskingGenerator
+from dinov2.data import collate_data_and_cast, DataAugmentationDINO, MaskingGenerator, DataAugmentationAvatarSearch
 from dinov2.data.datasets.contrastive_db import TrainContrastiveDataset
 import dinov2.distributed as distributed
 from dinov2.fsdp import FSDPCheckpointer
@@ -173,7 +173,8 @@ def do_train(cfg, model, resume=False):
         max_num_patches=0.5 * img_size // patch_size * img_size // patch_size,
     )
 
-    data_transform = DataAugmentationDINO(
+    # data_transform = DataAugmentationDINO(
+    data_transform = DataAugmentationAvatarSearch(
         cfg.crops.global_crops_scale,
         cfg.crops.local_crops_scale,
         cfg.crops.local_crops_number,
@@ -196,7 +197,7 @@ def do_train(cfg, model, resume=False):
         cfg.train.dataset_path,
         data_transform
     )
-    
+
     # sampler_type = SamplerType.INFINITE
     sampler_type = SamplerType.SHARDED_INFINITE
     data_loader = make_data_loader(
@@ -315,5 +316,11 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = get_args_parser(add_help=True).parse_args()
+
+    train_args_parser = get_args_parser(add_help=False)
+
+    from dinov2.run.submit import get_args_parser as get_submited_args_parser
+    description = "Submitit launcher for DINOv2 training"
+    args_parser = get_submited_args_parser(description=description, parents= [train_args_parser])
+    args = args_parser.parse_args()
     main(args)
