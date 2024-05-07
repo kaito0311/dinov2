@@ -10,5 +10,5 @@ dist/
 
 .vscode/
 output_dinov2/
-data/
+data/*
 pretrained/
